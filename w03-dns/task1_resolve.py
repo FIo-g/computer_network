@@ -178,9 +178,93 @@ class Resolver:
         dig @198.41.0.4 www.korea.ac.kr +norecurse
     """
 
+    def __init__(self, query=dig_query, max_depth=32):
+        self.query = query
+        self.max_depth = max_depth
+
     def resolve(self, name):
-        raise NotImplementedError(
-            "Implement the iterative walk: root -> TLD -> authoritative")
+        """주소와 실제로 질의한 서버 순서를 반환한다."""
+        path = []
+        budget = [self.max_depth]
+        address = self._resolve(normalize_name(name), path, budget, set())
+        return address, path
+
+    def _ask(self, server, name, path, budget):
+        """실패한 시도도 경로에 남기고 전체 질의 수를 제한한다."""
+        if budget[0] <= 0:
+            raise ResolutionError("resolution depth limit exceeded")
+        budget[0] -= 1
+        path.append(server)
+        return self.query(server, name)
+
+    def _resolve(self, name, path, budget, active_names):
+        if name in active_names:
+            raise ResolutionError(f"CNAME or nameserver loop at {name}")
+        active_names.add(name)
+        try:
+            servers = list(ROOT_SERVERS)
+            while servers:
+                delegated_servers = None
+                for server in servers:
+                    reply = self._ask(server, name, path, budget)
+                    if reply is None:
+                        continue
+                    if reply.status == "NXDOMAIN" and reply.authoritative:
+                        raise ResolutionError(f"authoritative NXDOMAIN for {name}")
+                    if reply.status != "NOERROR":
+                        continue
+
+                    cnames = [
+                        record.value
+                        for record in reply.answers
+                        if record.owner == name and record.rtype == "CNAME"
+                    ]
+                    if cnames:
+                        return self._resolve(cnames[0], path, budget, active_names)
+
+                    addresses = [
+                        record.value
+                        for record in reply.answers
+                        if record.owner == name and record.rtype == "A"
+                    ]
+                    if reply.authoritative and addresses:
+                        return addresses[0]
+
+                    ns_names = []
+                    for record in reply.authority:
+                        if record.rtype == "NS" and record.value not in ns_names:
+                            ns_names.append(record.value)
+                    if not ns_names:
+                        continue
+
+                    glue = {ns_name: [] for ns_name in ns_names}
+                    for record in reply.additional:
+                        if record.rtype == "A" and record.owner in glue:
+                            glue[record.owner].append(record.value)
+
+                    next_addresses = []
+                    for ns_name in ns_names:
+                        candidates = glue[ns_name]
+                        if not candidates:
+                            try:
+                                candidates = [
+                                    self._resolve(ns_name, path, budget, active_names)
+                                ]
+                            except ResolutionError:
+                                candidates = []
+                        for candidate in candidates:
+                            if candidate not in next_addresses:
+                                next_addresses.append(candidate)
+                    if next_addresses:
+                        delegated_servers = next_addresses
+                        break
+
+                if delegated_servers is None:
+                    break
+                servers = delegated_servers
+            raise ResolutionError(f"no authoritative A answer for {name}")
+        finally:
+            active_names.remove(name)
 
 
 # ------------------------------------------------------------------- harness
