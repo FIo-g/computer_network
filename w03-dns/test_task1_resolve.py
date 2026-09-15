@@ -13,13 +13,9 @@ def dns_record(owner, rtype, value):
     return t1.DNSRecord(owner, rtype, value)
 
 
-def dns_reply(
-    *, authoritative=False, answers=(), authority=(), additional=(), status="NOERROR"
-):
+def dns_reply(*, authoritative=False, answers=(), authority=(), additional=(), status="NOERROR"):
     """리졸버 시나리오에 사용할 불변 응답을 만든다."""
-    return t1.DNSReply(
-        status, authoritative, tuple(answers), tuple(authority), tuple(additional)
-    )
+    return t1.DNSReply(status, authoritative, tuple(answers), tuple(authority), tuple(additional))
 
 
 class TestTask1DigParsing(unittest.TestCase):
@@ -70,9 +66,7 @@ ns1.example. 86400 IN A 192.0.2.53
         self.assertEqual(reply.status, "NOERROR")
 
     def test_dig_failure_returns_none(self):
-        completed = subprocess.CompletedProcess(
-            args=[], returncode=9, stdout="", stderr="timeout"
-        )
+        completed = subprocess.CompletedProcess(args=[], returncode=9, stdout="", stderr="timeout")
         with patch.object(t1.subprocess, "run", return_value=completed):
             self.assertIsNone(t1.dig_query("192.0.2.53", "www.example"))
 
