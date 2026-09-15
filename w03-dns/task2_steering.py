@@ -87,6 +87,14 @@ OFFICIAL_ATTRIBUTION = (
     "Copyright 1996-2025 J.F. Kurose, K.W. Ross. All Rights Reserved."
 )
 
+MEASUREMENT_KEYS = {
+    "chain",
+    "original_zone",
+    "final_zone",
+    "resolver_addresses",
+    "errors",
+}
+
 
 class LookupFailure(RuntimeError):
     """측정 질의나 저장 데이터가 완전하지 않을 때 사용한다."""
@@ -265,11 +273,26 @@ def validate_report_inputs(data, evidence, capture_path):
         elif current != network_set:
             raise LookupFailure("every site must have the same named networks")
         for network, measurement in measurements.items():
+            if not isinstance(measurement, dict) or set(measurement) != MEASUREMENT_KEYS:
+                raise LookupFailure(
+                    f"measurement keys are invalid for {site} on {network}"
+                )
             if measurement.get("errors"):
                 raise LookupFailure(f"lookup errors remain for {site} on {network}")
             chain = measurement.get("chain")
             if not isinstance(chain, list) or not chain:
                 raise LookupFailure(f"missing CNAME chain for {site} on {network}")
+            try:
+                normalized_chain = [normalize_name(value) for value in chain]
+            except (AttributeError, LookupFailure) as error:
+                raise LookupFailure(
+                    f"invalid CNAME chain for {site} on {network}"
+                ) from error
+            if normalized_chain != chain or normalized_chain[0] != normalize_name(site):
+                raise LookupFailure(
+                    f"CNAME chain must begin with normalized site origin for {site} "
+                    f"on {network}"
+                )
             if not measurement.get("original_zone") or not measurement.get("final_zone"):
                 raise LookupFailure(f"missing zone for {site} on {network}")
             addresses = measurement.get("resolver_addresses", {})
@@ -284,6 +307,8 @@ def validate_report_inputs(data, evidence, capture_path):
                     )
 
     network_set = network_set or set()
+    if any(not isinstance(network, str) or not network.strip() for network in network_set):
+        raise LookupFailure("network labels must not be empty or whitespace")
     if len(network_set) < 2 or "network-1" in network_set:
         raise LookupFailure("report requires at least two named networks")
     network_notes = evidence.get("network_notes", {})

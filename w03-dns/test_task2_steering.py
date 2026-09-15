@@ -247,6 +247,27 @@ class TestTask2Report(unittest.TestCase):
         with self.assertRaisesRegex(t2.LookupFailure, "named networks"):
             t2.validate_report_inputs(data, evidence, "capture.pcapng")
 
+    def test_whitespace_only_network_label_is_rejected(self):
+        data = valid_task2_data()
+        for site_data in data.values():
+            site_data["measurements"]["   "] = site_data["measurements"].pop(
+                "campus-wifi"
+            )
+        evidence = valid_task2_evidence()
+        evidence["network_notes"]["   "] = evidence["network_notes"].pop(
+            "campus-wifi"
+        )
+        evidence["capture"].update(
+            {
+                "source_type": "official-trace",
+                "attribution": t2.OFFICIAL_ATTRIBUTION,
+                "whose_machine_and_evidence": "Official lab trace metadata.",
+            }
+        )
+
+        with self.assertRaisesRegex(t2.LookupFailure, "network label"):
+            t2.validate_report_inputs(data, evidence, None)
+
     def test_recorded_lookup_error_blocks_report(self):
         data = valid_task2_data()
         data["www.cnn.com"]["measurements"]["campus-wifi"]["errors"] = {
@@ -254,6 +275,25 @@ class TestTask2Report(unittest.TestCase):
         }
 
         with self.assertRaisesRegex(t2.LookupFailure, "lookup errors"):
+            t2.validate_report_inputs(data, valid_task2_evidence(), "capture.pcapng")
+
+    def test_measurement_requires_exact_canonical_keys(self):
+        data = valid_task2_data()
+        measurement = data["www.cnn.com"]["measurements"]["campus-wifi"]
+        measurement.pop("errors")
+        measurement["edited"] = True
+
+        with self.assertRaisesRegex(t2.LookupFailure, "measurement keys"):
+            t2.validate_report_inputs(data, valid_task2_evidence(), "capture.pcapng")
+
+    def test_cname_chain_requires_normalized_origin_and_names(self):
+        data = valid_task2_data()
+        data["www.cnn.com"]["measurements"]["campus-wifi"]["chain"] = [
+            "WWW.CNN.COM.",
+            " ",
+        ]
+
+        with self.assertRaisesRegex(t2.LookupFailure, "CNAME chain"):
             t2.validate_report_inputs(data, valid_task2_evidence(), "capture.pcapng")
 
     def test_rule_must_disagree_with_at_least_one_reviewed_judgment(self):
