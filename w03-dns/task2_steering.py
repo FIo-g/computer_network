@@ -53,6 +53,7 @@ import argparse
 import ipaddress
 import json
 import os
+import re
 import subprocess
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -78,6 +79,13 @@ RESOLVERS = {
     "google": "8.8.8.8",
     "quad9":  "9.9.9.9",
 }
+
+OFFICIAL_ATTRIBUTION = (
+    "Wireshark lab trace files from J.F. Kurose and K.W. Ross,\n"
+    "*Computer Networking: A Top-Down Approach*, 9th ed.\n"
+    "<https://gaia.cs.umass.edu/kurose_ross/>\n"
+    "Copyright 1996-2025 J.F. Kurose, K.W. Ross. All Rights Reserved."
+)
 
 
 class LookupFailure(RuntimeError):
@@ -230,13 +238,265 @@ def collect(network="network-1", replace=False, out_path=None, lookup=dig):
     return data
 
 
-def report():
-    """Read out/chains.json and produce out/report.md.
+def rule_verdict(site_data):
+    """어느 측정에서든 원본과 최종 zone이 다르면 제3자 규칙을 참으로 본다."""
+    return any(
+        measurement["original_zone"] != measurement["final_zone"]
+        for measurement in site_data["measurements"].values()
+    )
 
-    You write this too - including the classification rule that decides
-    whether a site is on a third-party CDN.
-    """
-    raise NotImplementedError("build the report")
+
+def _positive_integer(value, label):
+    if type(value) is not int or value <= 0:
+        raise LookupFailure(f"{label} must be a positive integer")
+
+
+def validate_report_inputs(data, evidence, capture_path):
+    """자동 보고서가 사람의 관찰을 꾸며 내지 않도록 입력을 엄격히 검사한다."""
+    if set(data) != set(SITES):
+        raise LookupFailure("chains.json must contain exactly SITES")
+
+    network_set = None
+    for site in SITES:
+        measurements = data[site].get("measurements", {})
+        current = set(measurements)
+        if network_set is None:
+            network_set = current
+        elif current != network_set:
+            raise LookupFailure("every site must have the same named networks")
+        for network, measurement in measurements.items():
+            if measurement.get("errors"):
+                raise LookupFailure(f"lookup errors remain for {site} on {network}")
+            chain = measurement.get("chain")
+            if not isinstance(chain, list) or not chain:
+                raise LookupFailure(f"missing CNAME chain for {site} on {network}")
+            if not measurement.get("original_zone") or not measurement.get("final_zone"):
+                raise LookupFailure(f"missing zone for {site} on {network}")
+            addresses = measurement.get("resolver_addresses", {})
+            if set(addresses) != set(RESOLVERS):
+                raise LookupFailure(f"missing resolver result for {site} on {network}")
+            if any(not values for values in addresses.values()):
+                raise LookupFailure(f"empty resolver result for {site} on {network}")
+            for values in addresses.values():
+                if ipv4_answers(values) != values:
+                    raise LookupFailure(
+                        f"invalid resolver address set for {site} on {network}"
+                    )
+
+    network_set = network_set or set()
+    if len(network_set) < 2 or "network-1" in network_set:
+        raise LookupFailure("report requires at least two named networks")
+    network_notes = evidence.get("network_notes", {})
+    if set(network_notes) != network_set or any(
+        not isinstance(note, str) or not note.strip()
+        for note in network_notes.values()
+    ):
+        raise LookupFailure("network_notes must describe every named network")
+
+    classifications = evidence.get("classifications", {})
+    if set(classifications) != set(SITES):
+        raise LookupFailure("classifications must contain exactly SITES")
+    for site, classification in classifications.items():
+        if type(classification.get("cdn_hosted")) is not bool:
+            raise LookupFailure(f"cdn_hosted must be boolean for {site}")
+        if type(classification.get("third_party")) is not bool:
+            raise LookupFailure(f"third_party must be boolean for {site}")
+        if not isinstance(classification.get("reason"), str) or not classification[
+            "reason"
+        ].strip():
+            raise LookupFailure(f"classification reason is required for {site}")
+    mismatches = [
+        site
+        for site in SITES
+        if rule_verdict(data[site]) != classifications[site]["third_party"]
+    ]
+    if not mismatches:
+        raise LookupFailure("at least one reviewed rule mismatch is required")
+
+    conclusion = evidence.get("steering_conclusion")
+    if not isinstance(conclusion, str) or not conclusion.strip():
+        raise LookupFailure("steering_conclusion is required")
+
+    capture = evidence.get("capture", {})
+    source_type = capture.get("source_type")
+    if source_type not in {"own-capture", "official-trace"}:
+        raise LookupFailure("capture source_type must be own-capture or official-trace")
+    for field in (
+        "matched_query_packet",
+        "matched_response_packet",
+        "delegation_response_packet",
+        "answer_response_packet",
+    ):
+        _positive_integer(capture.get(field), field)
+    if not re.fullmatch(r"0x[0-9a-fA-F]{1,4}", str(capture.get("transaction_id", ""))):
+        raise LookupFailure("transaction_id must be a hexadecimal DNS ID")
+    largest = capture.get("largest_response", {})
+    for field in ("packet", "dns_message_bytes", "frame_bytes"):
+        _positive_integer(largest.get(field), f"largest_response.{field}")
+    if not isinstance(largest.get("reason"), str) or not largest["reason"].strip():
+        raise LookupFailure("largest_response.reason is required")
+
+    if source_type == "own-capture":
+        if (
+            capture_path is None
+            or not os.path.isfile(capture_path)
+            or os.path.getsize(capture_path) == 0
+        ):
+            raise LookupFailure("own-capture evidence requires a nonempty dns.pcapng")
+    else:
+        if capture.get("attribution") != OFFICIAL_ATTRIBUTION:
+            raise LookupFailure("official trace requires exact attribution")
+        explanation = capture.get("whose_machine_and_evidence")
+        if not isinstance(explanation, str) or not explanation.strip():
+            raise LookupFailure("official trace requires whose_machine_and_evidence")
+
+    return sorted(network_set)
+
+
+def steering_count(data, evidence):
+    """CDN 사이트마다 관측된 주소 집합이 하나보다 많은지 한 번만 센다."""
+    differing = 0
+    denominator = 0
+    for site in SITES:
+        if not evidence["classifications"][site]["cdn_hosted"]:
+            continue
+        denominator += 1
+        observed = set()
+        for measurement in data[site]["measurements"].values():
+            for addresses in measurement["resolver_addresses"].values():
+                if addresses:
+                    observed.add(tuple(addresses))
+        if len(observed) > 1:
+            differing += 1
+    return differing, denominator
+
+
+def _markdown(value):
+    return str(value).replace("|", "\\|").replace("\n", " ").strip()
+
+
+def render_report(data, evidence, networks):
+    """검증된 원시 자료와 사람의 판단만 Markdown 보고서로 조합한다."""
+    lines = ["# DNS Steering Report", "", "## Measurement Networks", ""]
+    for network in networks:
+        lines.append(
+            f"- **{_markdown(network)}**: "
+            f"{_markdown(evidence['network_notes'][network])}"
+        )
+
+    lines.extend(
+        [
+            "",
+            "## CDN and Third-Party Classification",
+            "",
+            "Rule: final authoritative zone differs from original authoritative zone.",
+            "",
+            "| site | chain length | final zone | third party? | rule verdict |",
+            "|---|---:|---|---|---|",
+        ]
+    )
+    for site in SITES:
+        measurements = data[site]["measurements"]
+        chain_lengths = "<br>".join(
+            f"{_markdown(network)}: {len(measurements[network]['chain']) - 1}"
+            for network in networks
+        )
+        zones = "<br>".join(
+            f"{_markdown(network)}: "
+            f"{_markdown(measurements[network]['final_zone'])}"
+            for network in networks
+        )
+        reviewed = evidence["classifications"][site]["third_party"]
+        verdict = rule_verdict(data[site])
+        lines.append(
+            f"| `{site}` | {chain_lengths} | {zones} | "
+            f"{'yes' if reviewed else 'no'} | {'yes' if verdict else 'no'} |"
+        )
+
+    lines.extend(["", "## Resolver Address Sets", ""])
+    for site in SITES:
+        lines.append(f"### `{site}`")
+        lines.append("")
+        for network in networks:
+            addresses = data[site]["measurements"][network]["resolver_addresses"]
+            for resolver in RESOLVERS:
+                lines.append(
+                    f"- {_markdown(network)} / {resolver}: "
+                    f"{', '.join(addresses[resolver])}"
+                )
+        lines.append("")
+
+    differing, denominator = steering_count(data, evidence)
+    lines.extend(
+        [
+            "## Resolver Steering",
+            "",
+            f"{differing} of {denominator} CDN-hosted sites answered differently "
+            "to a different resolver or network.",
+            "",
+            _markdown(evidence["steering_conclusion"]),
+            "",
+            "## Rule Mismatches",
+            "",
+        ]
+    )
+    for site in SITES:
+        classification = evidence["classifications"][site]
+        if rule_verdict(data[site]) != classification["third_party"]:
+            lines.append(f"- `{site}`: {_markdown(classification['reason'])}")
+
+    capture = evidence["capture"]
+    largest = capture["largest_response"]
+    lines.extend(
+        [
+            "",
+            "## Packet Capture Evidence",
+            "",
+            f"- matched query: {capture['matched_query_packet']}",
+            f"- matched response: {capture['matched_response_packet']}",
+            f"- transaction ID `{capture['transaction_id']}`",
+            f"- delegation response: {capture['delegation_response_packet']}",
+            f"- answer response: {capture['answer_response_packet']}",
+            f"- largest response packet: {largest['packet']}",
+            f"- DNS message bytes: {largest['dns_message_bytes']}",
+            f"- frame bytes: {largest['frame_bytes']}",
+            f"- why it was large: {_markdown(largest['reason'])}",
+        ]
+    )
+    if capture["source_type"] == "official-trace":
+        lines.extend(
+            [
+                "",
+                "### Official Trace Provenance",
+                "",
+                _markdown(capture["whose_machine_and_evidence"]),
+                "",
+                capture["attribution"],
+            ]
+        )
+    return "\n".join(lines).rstrip() + "\n"
+
+
+def report(chains_path=None, evidence_path=None, report_path=None, capture_path=None):
+    """검증을 통과한 자료로만 out/report.md를 작성한다."""
+    chains_path = chains_path or os.path.join(OUT, "chains.json")
+    evidence_path = evidence_path or os.path.join(OUT, "task2_evidence.json")
+    report_path = report_path or os.path.join(OUT, "report.md")
+    capture_path = capture_path or os.path.join(OUT, "dns.pcapng")
+    with open(chains_path, encoding="utf-8") as handle:
+        data = json.load(handle)
+    with open(evidence_path, encoding="utf-8") as handle:
+        evidence = json.load(handle)
+    networks = validate_report_inputs(data, evidence, capture_path)
+    text = render_report(data, evidence, networks)
+    directory = os.path.dirname(report_path)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
+    temporary = f"{report_path}.tmp"
+    with open(temporary, "w", encoding="utf-8") as handle:
+        handle.write(text)
+    os.replace(temporary, report_path)
+    return text
 
 
 if __name__ == "__main__":
@@ -245,15 +505,18 @@ if __name__ == "__main__":
     parser.add_argument("--report", action="store_true")
     parser.add_argument("--network", default="network-1")
     parser.add_argument("--replace", action="store_true")
+    parser.add_argument("--evidence")
     arguments = parser.parse_args()
     os.makedirs(OUT, exist_ok=True)
     if arguments.replace and not arguments.collect:
         parser.error("--replace requires --collect")
+    if arguments.evidence and not arguments.report:
+        parser.error("--evidence requires --report")
     if arguments.collect and arguments.report:
         parser.error("choose exactly one of --collect or --report")
     if arguments.collect:
         collect(arguments.network, arguments.replace)
     elif arguments.report:
-        report()
+        report(evidence_path=arguments.evidence)
     else:
         parser.print_help()
