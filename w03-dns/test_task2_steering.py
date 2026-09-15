@@ -286,11 +286,27 @@ class TestTask2Report(unittest.TestCase):
         with self.assertRaisesRegex(t2.LookupFailure, "measurement keys"):
             t2.validate_report_inputs(data, valid_task2_evidence(), "capture.pcapng")
 
+    def test_measurement_rejects_extra_key_without_missing_canonical_key(self):
+        data = valid_task2_data()
+        data["www.cnn.com"]["measurements"]["campus-wifi"]["edited"] = True
+
+        with self.assertRaisesRegex(t2.LookupFailure, "measurement keys"):
+            t2.validate_report_inputs(data, valid_task2_evidence(), "capture.pcapng")
+
     def test_cname_chain_requires_normalized_origin_and_names(self):
         data = valid_task2_data()
         data["www.cnn.com"]["measurements"]["campus-wifi"]["chain"] = [
             "WWW.CNN.COM.",
             " ",
+        ]
+
+        with self.assertRaisesRegex(t2.LookupFailure, "CNAME chain"):
+            t2.validate_report_inputs(data, valid_task2_evidence(), "capture.pcapng")
+
+    def test_cname_chain_rejects_normalized_wrong_origin(self):
+        data = valid_task2_data()
+        data["www.cnn.com"]["measurements"]["campus-wifi"]["chain"] = [
+            "www.example.com"
         ]
 
         with self.assertRaisesRegex(t2.LookupFailure, "CNAME chain"):
