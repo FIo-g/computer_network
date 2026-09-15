@@ -74,10 +74,21 @@ class YourCache:
 
     def __init__(self, upstream):
         self.upstream = upstream
-        raise NotImplementedError("write your cache")
+        self.entries = {}
 
     def lookup(self, name, now):
-        raise NotImplementedError("write your cache")
+        """TTL이 남은 답만 재사용하고 만료 시 upstream에서 다시 가져온다."""
+        entry = self.entries.get(name)
+        if entry is not None:
+            address, expires_at = entry
+            if now < expires_at:
+                return address
+            del self.entries[name]
+
+        address, ttl = self.upstream(name)
+        if ttl > 0:
+            self.entries[name] = (address, now + ttl)
+        return address
 
     def stats(self):
-        return {}
+        return {"entries": len(self.entries)}
