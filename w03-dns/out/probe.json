@@ -1,0 +1,1113 @@
+{
+ "primary": "home-wifi",
+ "networks": {
+  "home-wifi": {
+   "kind": "physical",
+   "collected_at": "2026-10-06T22:05:32+09:00",
+   "public_ip": "182.218.46.139",
+   "public_as": {
+    "asn": 17858,
+    "prefix": "182.216.0.0/14",
+    "cc": "KR",
+    "as_name": "POWERVIS-AS-KR-KR - LG POWERCOMM, KR"
+   },
+   "resolvers": {
+    "system": {
+     "configured": "1.214.68.2",
+     "used": "1.214.68.2",
+     "unreachable": [],
+     "seen_by_authority": {
+      "ns": "2001:270:0:a1::f5:201",
+      "ns_as": {
+       "asn": 3786,
+       "prefix": "2001:270::/36",
+       "cc": "KR",
+       "as_name": "LGDACOM-KR - LG DACOM Corporation, KR"
+      }
+     }
+    },
+    "google": {
+     "configured": "8.8.8.8",
+     "used": "8.8.8.8",
+     "unreachable": [],
+     "seen_by_authority": {
+      "ip": "182.218.46.207",
+      "ns": "74.125.179.158",
+      "ecs": "182.218.46.0/24/24",
+      "ns_as": {
+       "asn": 15169,
+       "prefix": "74.125.176.0/20",
+       "cc": "US",
+       "as_name": "GOOGLE - Google LLC, US"
+      }
+     }
+    },
+    "quad9": {
+     "configured": "9.9.9.9",
+     "used": "149.112.112.112",
+     "unreachable": [
+      "9.9.9.9"
+     ],
+     "seen_by_authority": {
+      "ns": "2a04:c607:33:14:9999::145",
+      "id.server": "res720.qsin6",
+      "ns_as": {
+       "asn": 49544,
+       "prefix": "2a04:c607::/32",
+       "cc": "NL",
+       "as_name": "i3Dnet - i3D.net B.V, NL"
+      }
+     }
+    }
+   },
+   "rtt_remeasured_at": "2026-10-06T22:22:50+09:00"
+  },
+  "ecs-kr-campus": {
+   "kind": "ecs-simulated",
+   "subnet": "163.152.0.0/24",
+   "via": "8.8.8.8",
+   "collected_from": "lte",
+   "collected_at": "2026-10-06T22:18:12+09:00",
+   "seen_by_authority": {
+    "forwarded_ecs": "163.152.0.0/24"
+   }
+  },
+  "ecs-us-stanford": {
+   "kind": "ecs-simulated",
+   "subnet": "171.64.0.0/24",
+   "via": "8.8.8.8",
+   "collected_from": "lte",
+   "collected_at": "2026-10-06T22:18:12+09:00",
+   "seen_by_authority": {
+    "forwarded_ecs": "171.64.0.0/24"
+   }
+  },
+  "lte": {
+   "kind": "physical",
+   "collected_at": "2026-10-06T22:18:12+09:00",
+   "public_ip": "211.235.73.246",
+   "public_as": {
+    "asn": 9644,
+    "prefix": "211.235.64.0/18",
+    "cc": "KR",
+    "as_name": "SKTELECOM-NET-AS-KR - SK Telecom, KR"
+   },
+   "resolvers": {
+    "system": {
+     "configured": "fe80::8c98:6bff:fedb:564%en0",
+     "used": "fe80::8c98:6bff:fedb:564%en0",
+     "unreachable": [],
+     "seen_by_authority": {
+      "ns": "223.62.68.29",
+      "ns_as": {
+       "asn": 9644,
+       "prefix": "223.32.0.0/11",
+       "cc": "KR",
+       "as_name": "SKTELECOM-NET-AS-KR - SK Telecom, KR"
+      }
+     }
+    },
+    "google": {
+     "configured": "8.8.8.8",
+     "used": "8.8.8.8",
+     "unreachable": [],
+     "seen_by_authority": {
+      "ecs": "211.235.73.0/24/24",
+      "ns": "172.217.108.220",
+      "ip": "211.235.73.246",
+      "ns_as": {
+       "asn": 15169,
+       "prefix": "172.217.0.0/16",
+       "cc": "US",
+       "as_name": "GOOGLE - Google LLC, US"
+      }
+     }
+    },
+    "quad9": {
+     "configured": "9.9.9.9",
+     "used": "9.9.9.9",
+     "unreachable": [],
+     "seen_by_authority": {
+      "ns": "2620:171:f5:f003:9999::244",
+      "id.server": "res700.itm",
+      "ns_as": {
+       "asn": 42,
+       "prefix": "2620:171:f5::/48",
+       "cc": "US",
+       "as_name": "WOODYNET-1 - WoodyNet, Inc., US"
+      }
+     }
+    }
+   },
+   "public_ip_via": "whoami.ds.akahelp.net @8.8.8.8"
+  }
+ },
+ "zones": {
+  "a1319.dscr.akamai.net": "dscr.akamai.net",
+  "atc.spotify.map.fastly.net": "fastly.net",
+  "bbc.map.fastly.net": "fastly.net",
+  "cnn-tls.map.fastly.net": "fastly.net",
+  "dyna.wikimedia.org": "wikimedia.org",
+  "e13678.dscb.akamaiedge.net": "dscb.akamaiedge.net",
+  "e6858.dsce9.akamaiedge.net": "dsce9.akamaiedge.net",
+  "github.com": "github.com",
+  "nytimes.map.fastly.net": "fastly.net",
+  "stanford.netlifyglobalcdn.com": "netlifyglobalcdn.com",
+  "www-apple-com.v.aaplimg.com": "v.aaplimg.com",
+  "www.adobe.com": "adobe.com",
+  "www.adobe.com.edgesuite.net": "edgesuite.net",
+  "www.apple.com": "apple.com",
+  "www.apple.com.edgekey.net": "edgekey.net",
+  "www.bbc.co.uk": "bbc.co.uk",
+  "www.bbc.co.uk.pri.bbc.co.uk": "pri.bbc.co.uk",
+  "www.cnn.com": "cnn.com",
+  "www.github.com": "github.com",
+  "www.korea.ac.kr": "korea.ac.kr",
+  "www.microsoft.com": "microsoft.com",
+  "www.microsoft.com-c-3.edgekey.net": "edgekey.net",
+  "www.netflix.com": "netflix.com",
+  "www.nytimes.com": "nytimes.com",
+  "www.prd.map.nytimes.com": "nytimes.com",
+  "www.prd.map.nytimes.xovr.nyt.net": "xovr.nyt.net",
+  "www.prod.ftl.netflix.com": "prod.ftl.netflix.com",
+  "www.spotify.com": "spotify.com",
+  "www.stanford.edu": "stanford.edu",
+  "www.wikipedia.org": "wikipedia.org"
+ },
+ "addrs": {
+  "3.33.186.135": {
+   "rtt_ms": {
+    "home-wifi": 9.5,
+    "lte": 51.9
+   },
+   "as": {
+    "asn": 16509,
+    "prefix": "3.33.176.0/20",
+    "cc": "US",
+    "as_name": "AMAZON-02 - Amazon.com, Inc., US"
+   }
+  },
+  "15.197.167.90": {
+   "rtt_ms": {
+    "home-wifi": 10.4,
+    "lte": 51.6
+   },
+   "as": {
+    "asn": 16509,
+    "prefix": "15.197.160.0/20",
+    "cc": "US",
+    "as_name": "AMAZON-02 - Amazon.com, Inc., US"
+   }
+  },
+  "20.200.245.247": {
+   "rtt_ms": {
+    "home-wifi": 10.5,
+    "lte": 51.8
+   },
+   "as": {
+    "asn": 8075,
+    "prefix": "20.192.0.0/10",
+    "cc": "US",
+    "as_name": "MICROSOFT-CORP-MSN-AS-BLOCK - Microsoft Corporation, US"
+   }
+  },
+  "20.205.243.166": {
+   "rtt_ms": {
+    "home-wifi": 73.7,
+    "lte": 100.0
+   },
+   "as": {
+    "asn": 8075,
+    "prefix": "20.192.0.0/10",
+    "cc": "US",
+    "as_name": "MICROSOFT-CORP-MSN-AS-BLOCK - Microsoft Corporation, US"
+   }
+  },
+  "23.32.4.146": {
+   "rtt_ms": {
+    "home-wifi": 10.5,
+    "lte": 32.6
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.162": {
+   "rtt_ms": {
+    "home-wifi": 9.5,
+    "lte": 26.0
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.168": {
+   "rtt_ms": {
+    "home-wifi": 9.4,
+    "lte": 39.8
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.178": {
+   "rtt_ms": {
+    "home-wifi": 9.4,
+    "lte": 44.4
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.187": {
+   "rtt_ms": {
+    "home-wifi": 9.6,
+    "lte": 37.6
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.201": {
+   "rtt_ms": {
+    "home-wifi": 12.0,
+    "lte": 41.5
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.216": {
+   "rtt_ms": {
+    "home-wifi": 11.0,
+    "lte": 44.7
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.227": {
+   "rtt_ms": {
+    "home-wifi": 9.6,
+    "lte": 44.7
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.35.101.225": {
+   "rtt_ms": {
+    "home-wifi": 38.8,
+    "lte": 62.6
+   },
+   "as": {
+    "asn": 16625,
+    "prefix": "23.35.100.0/22",
+    "cc": "US",
+    "as_name": "AKAMAI-AS - Akamai Technologies, Inc., US"
+   }
+  },
+  "23.41.89.203": {
+   "rtt_ms": {
+    "home-wifi": 9.5,
+    "lte": 45.4
+   },
+   "as": {
+    "asn": 16625,
+    "prefix": "23.41.80.0/20",
+    "cc": "US",
+    "as_name": "AKAMAI-AS - Akamai Technologies, Inc., US"
+   }
+  },
+  "23.44.5.194": {
+   "rtt_ms": {
+    "home-wifi": 90.7,
+    "lte": 125.6
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.44.4.0/23",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.44.5.203": {
+   "rtt_ms": {
+    "home-wifi": 101.3,
+    "lte": 119.1
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.44.4.0/23",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.45.207.199": {
+   "rtt_ms": {
+    "home-wifi": 104.9,
+    "lte": 99.4
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.45.207.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.45.207.208": {
+   "rtt_ms": {
+    "home-wifi": 108.5,
+    "lte": 105.7
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.45.207.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.62.21.78": {
+   "rtt_ms": {
+    "home-wifi": 38.6,
+    "lte": 66.0
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.62.21.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.62.21.82": {
+   "rtt_ms": {
+    "home-wifi": 40.0,
+    "lte": 59.7
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.62.21.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.62.21.104": {
+   "rtt_ms": {
+    "home-wifi": 39.7,
+    "lte": 67.6
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.62.21.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.197.225.61": {
+   "rtt_ms": {
+    "home-wifi": 46.2,
+    "lte": 81.2
+   },
+   "as": {
+    "asn": 16625,
+    "prefix": "23.197.224.0/22",
+    "cc": "US",
+    "as_name": "AKAMAI-AS - Akamai Technologies, Inc., US"
+   }
+  },
+  "23.217.180.246": {
+   "rtt_ms": {
+    "home-wifi": 42.2,
+    "lte": 55.5
+   },
+   "as": {
+    "asn": 16625,
+    "prefix": "23.217.180.0/22",
+    "cc": "US",
+    "as_name": "AKAMAI-AS - Akamai Technologies, Inc., US"
+   }
+  },
+  "103.102.166.224": {
+   "rtt_ms": {
+    "home-wifi": 119.7,
+    "lte": 92.1
+   },
+   "as": {
+    "asn": 14907,
+    "prefix": "103.102.166.0/24",
+    "cc": "US",
+    "as_name": "WIKIMEDIA - Wikimedia Foundation Inc., US"
+   }
+  },
+  "104.75.39.192": {
+   "rtt_ms": {
+    "home-wifi": 9.3,
+    "lte": 38.3
+   },
+   "as": {
+    "asn": 16625,
+    "prefix": "104.75.32.0/20",
+    "cc": "US",
+    "as_name": "AKAMAI-AS - Akamai Technologies, Inc., US"
+   }
+  },
+  "104.83.197.169": {
+   "rtt_ms": {
+    "home-wifi": 95.4,
+    "lte": 103.8
+   },
+   "as": {
+    "asn": 16625,
+    "prefix": "104.83.196.0/22",
+    "cc": "US",
+    "as_name": "AKAMAI-AS - Akamai Technologies, Inc., US"
+   }
+  },
+  "104.115.218.183": {
+   "rtt_ms": {
+    "home-wifi": 72.5,
+    "lte": 130.7
+   },
+   "as": {
+    "asn": 16625,
+    "prefix": "104.115.208.0/20",
+    "cc": "US",
+    "as_name": "AKAMAI-AS - Akamai Technologies, Inc., US"
+   }
+  },
+  "140.82.116.4": {
+   "rtt_ms": {
+    "home-wifi": 169.3
+   },
+   "as": {
+    "asn": 36459,
+    "prefix": "140.82.116.0/24",
+    "cc": "US",
+    "as_name": "GITHUB - GitHub, Inc., US"
+   }
+  },
+  "146.75.48.81": {
+   "rtt_ms": {
+    "home-wifi": 9.2,
+    "lte": 40.2
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "146.75.48.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "146.75.49.164": {
+   "rtt_ms": {
+    "home-wifi": 9.2,
+    "lte": 46.2
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "146.75.48.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "146.75.51.5": {
+   "rtt_ms": {
+    "home-wifi": 9.4,
+    "lte": 27.4
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "146.75.48.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "146.75.51.42": {
+   "rtt_ms": {
+    "home-wifi": 9.1,
+    "lte": 33.9
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "146.75.48.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.0.81": {
+   "rtt_ms": {
+    "home-wifi": 12.3,
+    "lte": 29.1
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.0.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.1.164": {
+   "rtt_ms": {
+    "home-wifi": 11.1,
+    "lte": 51.5
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.0.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.3.5": {
+   "rtt_ms": {
+    "home-wifi": 11.9,
+    "lte": 42.1
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.0.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.3.42": {
+   "rtt_ms": {
+    "home-wifi": 11.0,
+    "lte": 39.5
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.0.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.64.81": {
+   "rtt_ms": {
+    "home-wifi": 11.2,
+    "lte": 43.5
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.64.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.65.164": {
+   "rtt_ms": {
+    "home-wifi": 10.7,
+    "lte": 37.4
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.64.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.67.5": {
+   "rtt_ms": {
+    "home-wifi": 13.4,
+    "lte": 37.2
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.64.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.67.42": {
+   "rtt_ms": {
+    "home-wifi": 11.1,
+    "lte": 46.3
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.64.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.128.81": {
+   "rtt_ms": {
+    "home-wifi": 12.1,
+    "lte": 46.8
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.128.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.129.164": {
+   "rtt_ms": {
+    "home-wifi": 12.1,
+    "lte": 44.7
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.128.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.131.5": {
+   "rtt_ms": {
+    "home-wifi": 11.2,
+    "lte": 43.1
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.128.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.131.42": {
+   "rtt_ms": {
+    "home-wifi": 12.4,
+    "lte": 47.5
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.128.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.192.81": {
+   "rtt_ms": {
+    "home-wifi": 10.9,
+    "lte": 47.3
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.192.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.193.164": {
+   "rtt_ms": {
+    "home-wifi": 12.5,
+    "lte": 42.9
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.192.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.195.5": {
+   "rtt_ms": {
+    "home-wifi": 11.7,
+    "lte": 46.0
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.192.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "151.101.195.42": {
+   "rtt_ms": {
+    "home-wifi": 10.3,
+    "lte": 38.9
+   },
+   "as": {
+    "asn": 54113,
+    "prefix": "151.101.192.0/22",
+    "cc": "US",
+    "as_name": "FASTLY - Fastly, Inc., US"
+   }
+  },
+  "163.152.6.10": {
+   "rtt_ms": {
+    "home-wifi": 11.4,
+    "lte": 42.0
+   },
+   "as": {
+    "asn": 9452,
+    "prefix": "163.152.0.0/16",
+    "cc": "KR",
+    "as_name": "KUNET-AS-KR - Korea University, KR"
+   }
+  },
+  "172.182.252.133": {
+   "rtt_ms": {
+    "home-wifi": 148.8
+   },
+   "as": {
+    "asn": 8075,
+    "prefix": "172.160.0.0/11",
+    "cc": "GB",
+    "as_name": "MICROSOFT-CORP-MSN-AS-BLOCK - Microsoft Corporation, US"
+   }
+  },
+  "182.162.106.137": {
+   "rtt_ms": {
+    "home-wifi": 7.9,
+    "lte": 38.8
+   },
+   "as": {
+    "asn": 3786,
+    "prefix": "182.162.0.0/16",
+    "cc": "KR",
+    "as_name": "LGDACOM-KR - LG DACOM Corporation, KR"
+   }
+  },
+  "182.162.106.139": {
+   "rtt_ms": {
+    "home-wifi": 9.1,
+    "lte": 38.9
+   },
+   "as": {
+    "asn": 3786,
+    "prefix": "182.162.0.0/16",
+    "cc": "KR",
+    "as_name": "LGDACOM-KR - LG DACOM Corporation, KR"
+   }
+  },
+  "182.162.106.144": {
+   "rtt_ms": {
+    "home-wifi": 9.0,
+    "lte": 38.9
+   },
+   "as": {
+    "asn": 3786,
+    "prefix": "182.162.0.0/16",
+    "cc": "KR",
+    "as_name": "LGDACOM-KR - LG DACOM Corporation, KR"
+   }
+  },
+  "184.28.183.49": {
+   "rtt_ms": {
+    "home-wifi": 35.1,
+    "lte": 65.3
+   },
+   "as": {
+    "asn": 16625,
+    "prefix": "184.28.182.0/23",
+    "cc": "US",
+    "as_name": "AKAMAI-AS - Akamai Technologies, Inc., US"
+   }
+  },
+  "198.35.26.224": {
+   "rtt_ms": {
+    "home-wifi": 142.4,
+    "lte": 176.1
+   },
+   "as": {
+    "asn": 14907,
+    "prefix": "198.35.26.0/24",
+    "cc": "US",
+    "as_name": "WIKIMEDIA - Wikimedia Foundation Inc., US"
+   }
+  },
+  "207.45.72.1": {
+   "rtt_ms": {
+    "home-wifi": 44.6,
+    "lte": 84.4
+   },
+   "as": {
+    "asn": 40027,
+    "prefix": "207.45.72.0/24",
+    "cc": "US",
+    "as_name": "NETFLIX-ASN - Netflix Streaming Services Inc., US"
+   }
+  },
+  "207.45.73.1": {
+   "rtt_ms": {
+    "home-wifi": 43.4,
+    "lte": 65.6
+   },
+   "as": {
+    "asn": 40027,
+    "prefix": "207.45.73.0/24",
+    "cc": "US",
+    "as_name": "NETFLIX-ASN - Netflix Streaming Services Inc., US"
+   }
+  },
+  "20.27.177.113": {
+   "rtt_ms": {
+    "lte": 59.2,
+    "home-wifi": 30.9
+   },
+   "as": {
+    "asn": 8075,
+    "prefix": "20.0.0.0/11",
+    "cc": "US",
+    "as_name": "MICROSOFT-CORP-MSN-AS-BLOCK - Microsoft Corporation, US"
+   }
+  },
+  "23.0.193.49": {
+   "rtt_ms": {
+    "lte": 144.8,
+    "home-wifi": 127.0
+   },
+   "as": {
+    "asn": 16625,
+    "prefix": "23.0.192.0/22",
+    "cc": "US",
+    "as_name": "AKAMAI-AS - Akamai Technologies, Inc., US"
+   }
+  },
+  "23.0.194.92": {
+   "rtt_ms": {
+    "lte": 152.2,
+    "home-wifi": 126.0
+   },
+   "as": {
+    "asn": 16625,
+    "prefix": "23.0.192.0/22",
+    "cc": "US",
+    "as_name": "AKAMAI-AS - Akamai Technologies, Inc., US"
+   }
+  },
+  "23.32.4.34": {
+   "rtt_ms": {
+    "lte": 51.8,
+    "home-wifi": 9.3
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.74": {
+   "rtt_ms": {
+    "lte": 36.7,
+    "home-wifi": 10.8
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.80": {
+   "rtt_ms": {
+    "lte": 36.5,
+    "home-wifi": 8.8
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.82": {
+   "rtt_ms": {
+    "lte": 45.1,
+    "home-wifi": 8.7
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.88": {
+   "rtt_ms": {
+    "lte": 39.4,
+    "home-wifi": 9.1
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.97": {
+   "rtt_ms": {
+    "lte": 37.6,
+    "home-wifi": 9.7
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.107": {
+   "rtt_ms": {
+    "lte": 40.1,
+    "home-wifi": 9.0
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.136": {
+   "rtt_ms": {
+    "lte": 39.9,
+    "home-wifi": 9.5
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.32.4.138": {
+   "rtt_ms": {
+    "lte": 37.8,
+    "home-wifi": 10.2
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.32.4.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.35.218.227": {
+   "rtt_ms": {
+    "lte": 40.0,
+    "home-wifi": 10.5
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.35.218.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.35.218.232": {
+   "rtt_ms": {
+    "lte": 34.8,
+    "home-wifi": 10.3
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.35.218.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.49.205.28": {
+   "rtt_ms": {
+    "lte": 40.2,
+    "home-wifi": 8.7
+   },
+   "as": {
+    "asn": 16625,
+    "prefix": "23.49.204.0/22",
+    "cc": "US",
+    "as_name": "AKAMAI-AS - Akamai Technologies, Inc., US"
+   }
+  },
+  "23.49.206.40": {
+   "rtt_ms": {
+    "lte": 40.1,
+    "home-wifi": 9.6
+   },
+   "as": {
+    "asn": 16625,
+    "prefix": "23.49.204.0/22",
+    "cc": "US",
+    "as_name": "AKAMAI-AS - Akamai Technologies, Inc., US"
+   }
+  },
+  "23.63.226.92": {
+   "rtt_ms": {
+    "lte": 65.1,
+    "home-wifi": 39.9
+   },
+   "as": {
+    "asn": 16625,
+    "prefix": "23.63.226.0/23",
+    "cc": "US",
+    "as_name": "AKAMAI-AS - Akamai Technologies, Inc., US"
+   }
+  },
+  "23.219.78.45": {
+   "rtt_ms": {
+    "lte": 156.9,
+    "home-wifi": 122.5
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.219.78.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "23.219.78.49": {
+   "rtt_ms": {
+    "lte": 159.6,
+    "home-wifi": 123.9
+   },
+   "as": {
+    "asn": 20940,
+    "prefix": "23.219.78.0/24",
+    "cc": "US",
+    "as_name": "AKAMAI-ASN1 - Akamai International B.V., NL"
+   }
+  },
+  "140.82.116.3": {
+   "rtt_ms": {
+    "lte": 295.2,
+    "home-wifi": 145.7
+   },
+   "as": {
+    "asn": 36459,
+    "prefix": "140.82.116.0/24",
+    "cc": "US",
+    "as_name": "GITHUB - GitHub, Inc., US"
+   }
+  },
+  "184.28.245.49": {
+   "rtt_ms": {
+    "lte": 66.0,
+    "home-wifi": 34.4
+   },
+   "as": {
+    "asn": 16625,
+    "prefix": "184.28.244.0/23",
+    "cc": "US",
+    "as_name": "AKAMAI-AS - Akamai Technologies, Inc., US"
+   }
+  }
+ }
+}
