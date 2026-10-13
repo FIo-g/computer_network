@@ -1,0 +1,17 @@
+python 3.9.6 · arm64
+bench table 5,000 prefixes, 20,000 queries (seed 246)
+
+== 1. same table, four structures (best of 5 timings; LinearTable 1 timing)
+  LinearTable     261809 ns/lookup   memory   0.36 MB   wrong 0   steps 5000 (every entry)
+  BitTrie           1294 ns/lookup   memory   6.34 MB   wrong 0   steps avg 21.36 max 25
+  ByLength           190 ns/lookup   memory   0.22 MB   wrong 0   steps avg  2.61 max 7
+  YourTable          107 ns/lookup   memory   2.61 MB   wrong 0   steps avg  1.30 max 2
+
+  YourTable parts: _l16 65,536 slots, _d24 13,553 keys, _deep 0 blocks
+  route lengths in table: /24 x3034, /22 x610, /20 x505, /16 x499, /12 x235, /8 x116, /0 x1
+
+== 2. lookup cost vs table size N (bench generator, seed 1)
+  N=  1,000  YourTable    108 ns/lookup   LinearTable     53.3 us/lookup
+  N=  5,000  YourTable    110 ns/lookup   LinearTable    275.7 us/lookup
+  N= 20,000  YourTable    116 ns/lookup   LinearTable   1101.2 us/lookup
+  N=100,000  YourTable    127 ns/lookup

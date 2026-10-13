@@ -16,23 +16,78 @@ exactly the thing you are supposed to understand this week.
 import argparse
 
 
+_ALL_ONES = 0xFFFFFFFF
+
+
+def _mask(prefix_len):
+    """/24 -> 0xFFFFFF00, /0 -> 0. Shift left, then cut back to 32 bits."""
+    return (_ALL_ONES << (32 - prefix_len)) & _ALL_ONES
+
+
+def _ip_to_int(text):
+    """'163.152.6.0' -> 0xA3980600. Exactly four decimal octets, each 0-255.
+
+    A leading zero ('010') is rejected: C-style parsers read it as octal and
+    others as decimal, so it is ambiguous.
+    """
+    parts = text.split(".")
+    if len(parts) != 4:
+        raise ValueError(f"not a dotted-quad address: {text!r}")
+    value = 0
+    for part in parts:
+        if not (part.isascii() and part.isdigit()) or (len(part) > 1 and part[0] == "0"):
+            raise ValueError(f"bad octet {part!r} in {text!r}")
+        octet = int(part)
+        if octet > 255:
+            raise ValueError(f"octet {octet} > 255 in {text!r}")
+        value = (value << 8) | octet
+    return value
+
+
+def _int_to_ip(value):
+    """0xA3980600 -> '163.152.6.0'."""
+    return f"{(value >> 24) & 255}.{(value >> 16) & 255}.{(value >> 8) & 255}.{value & 255}"
+
+
 def parse_cidr(cidr):
     """'163.152.6.0/24' -> (network as int, prefix length).
 
-    Requirements: reject a prefix length outside 0-32, and reject an address
-    whose host bits are set when they should not be (163.152.6.5/24 is a
-    common way to write a host, but it is not a network).
+    Raises ValueError when:
+      * the text is not exactly '<a.b.c.d>/<n>' (one slash, decimal digits only)
+      * the prefix length is outside 0-32                            (R1)
+      * any host bit is set: '163.152.6.5/24' is a host, not a network (R2)
     """
-    raise NotImplementedError("parse a CIDR block")
+    if not isinstance(cidr, str) or cidr.count("/") != 1:
+        raise ValueError(f"not a CIDR block: {cidr!r}")
+    addr_text, len_text = cidr.strip().split("/")
+    if not (len_text.isascii() and len_text.isdigit()):
+        raise ValueError(f"bad prefix length in {cidr!r}")
+    prefix_len = int(len_text)
+    if not 0 <= prefix_len <= 32:
+        raise ValueError(f"prefix length {prefix_len} is outside 0-32 in {cidr!r}")
+    network = _ip_to_int(addr_text)
+    if network & ~_mask(prefix_len) & _ALL_ONES:
+        raise ValueError(f"{cidr} has host bits set - it is a host, not a network")
+    return network, prefix_len
 
 
 def network_range(cidr):
     """'163.152.6.0/24' -> (first usable, last usable, broadcast) as strings.
 
-    Careful at the edges. /31 and /32 do not have a usable host range in the
-    ordinary sense - decide what you return and say so in observation.md.
+    The edges, decided here (see observation.md):
+      /0-/30  network + 1, broadcast - 1, broadcast   (the textbook rule)
+      /31     (network, network + 1, None)  RFC 3021: a point-to-point link,
+              both addresses are hosts and there is no broadcast address
+      /32     (address, address, None)      a single host route
+    The cidr must be a network (host bits clear) - it goes through parse_cidr.
     """
-    raise NotImplementedError("compute the range")
+    network, prefix_len = parse_cidr(cidr)
+    broadcast = network | (~_mask(prefix_len) & _ALL_ONES)
+    if prefix_len == 32:
+        return _int_to_ip(network), _int_to_ip(network), None
+    if prefix_len == 31:
+        return _int_to_ip(network), _int_to_ip(broadcast), None
+    return _int_to_ip(network + 1), _int_to_ip(broadcast - 1), _int_to_ip(broadcast)
 
 
 class ForwardingTable:
@@ -40,16 +95,49 @@ class ForwardingTable:
 
     add(cidr, next_hop)  ·  lookup(address) -> next_hop or None
 
-    The default route 0.0.0.0/0 matches everything and is the shortest prefix,
-    so it must lose to any other match. If two entries have the same prefix
-    length, the table is malformed - say what you do.
+    Entries are grouped by prefix length ({length: {network: next_hop}}), and
+    lookup asks the lengths present from longest to shortest, stopping at the
+    first hit. 0.0.0.0/0 has length 0, so it is asked last and loses to any
+    other match (R5).
+
+    Same prefix added twice (same network, same length):
+      * same next hop       -> no-op
+      * different next hop  -> ValueError. Longest match cannot choose between
+        two entries of equal length, so the table is malformed; refusing at
+        add() is better than silently forwarding by insertion order.
+    Two different networks of the same length never overlap, so they are fine.
+
+    lookup takes a dotted-quad string or a 32-bit int; no match -> None.
     """
 
+    def __init__(self):
+        self._by_len = {}     # prefix length -> {network int: next hop}
+        self._lens = []       # prefix lengths present, longest first
+
     def add(self, cidr, next_hop):
-        raise NotImplementedError
+        network, prefix_len = parse_cidr(cidr)
+        group = self._by_len.get(prefix_len)
+        if group is None:
+            group = self._by_len[prefix_len] = {}
+            self._lens = sorted(self._by_len, reverse=True)
+        if network in group:
+            if group[network] == next_hop:
+                return
+            raise ValueError(f"{cidr} is already in the table -> {group[network]!r}; "
+                             f"refusing a second next hop {next_hop!r}")
+        group[network] = next_hop
 
     def lookup(self, address):
-        raise NotImplementedError
+        if isinstance(address, str):
+            address = _ip_to_int(address)
+        elif not isinstance(address, int) or not 0 <= address <= _ALL_ONES:
+            raise ValueError(f"not an IPv4 address: {address!r}")
+        for prefix_len in self._lens:
+            group = self._by_len[prefix_len]
+            key = address & _mask(prefix_len)
+            if key in group:
+                return group[key]
+        return None
 
 
 # ------------------------------------------------------------------- harness
