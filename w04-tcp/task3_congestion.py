@@ -1,32 +1,31 @@
 #!/usr/bin/env python3
-"""Week 4 · Task 3 — Beat the fixed window.
+"""Week 4 · Task 3 — 고정 윈도를 뛰어넘으세요.
 
-Textbook §3.7.
+교재 §3.7.
 
-`FixedWindow` is a sender that never adapts. It picks a window and keeps it,
-forever, no matter what the network says back. It is not a strawman: it is what
-you get if you skip congestion control entirely, and it was the internet's
-actual failure mode in October 1986.
+`FixedWindow`는 절대 적응하지 않는 송신자입니다. 윈도를 하나 정하면 네트워크가
+무엇을 돌려주든 영원히 그대로 유지합니다. 허수아비가 아닙니다: 혼잡 제어를 통째로
+건너뛰면 얻게 되는 것이 바로 이것이며, 1986년 10월 인터넷이 실제로 무너진 방식입니다.
 
-Write `YourControl` and beat it on the harness:
+`YourControl`을 작성하고 하네스에서 이것을 이기세요:
 
     python3 bench.py
     python3 bench.py --yours
 
-The interface is two events and one number:
+인터페이스는 사건 두 개와 숫자 하나입니다:
 
-    .window        how many packets you are willing to have in flight
-    .on_ack()      one packet made it there and back
-    .on_loss()     a packet was dropped, or timed out waiting for its ACK
+    .window        동시에 띄워 둘(in flight) 의향이 있는 패킷 수
+    .on_ack()      패킷 하나가 저쪽에 도착했다가 돌아옴
+    .on_loss()     패킷이 버려졌거나, ACK를 기다리다 타임아웃됨
 
-That is all the information a real TCP sender has. It cannot see the queue,
-it cannot see the link rate, and neither can you. You infer them from these
-two events, which is the entire idea of §3.7.
+실제 TCP 송신자가 가진 정보는 이것이 전부입니다. 큐도 볼 수 없고 링크 속도도 볼 수
+없으며, 여러분도 마찬가지입니다. 이 두 사건으로부터 그것들을 추론해야 하며, 그것이
+§3.7의 핵심 아이디어 전부입니다.
 """
 
 
 class FixedWindow:
-    """Send 64 packets at a time and never listen."""
+    """한 번에 64개 패킷을 보내고 아무것도 듣지 않습니다."""
 
     def __init__(self):
         self.window = 64
@@ -39,26 +38,65 @@ class FixedWindow:
 
 
 class YourControl:
-    """Your congestion control.
+    """여러분의 혼잡 제어.
 
-    Things worth knowing before you start:
+    시작하기 전에 알아 두면 좋은 것들:
 
-    * The link drains one packet per slot and the round trip is 20 slots, so
-      the pipe holds about 20 packets. Above that you are only filling a queue.
-    * The queue is 10 packets deep and drops from the tail. Filling it does not
-      make you faster - it makes you slower, and everybody behind you too.
-    * Cutting hard on every loss costs you throughput. Not cutting costs you
-      correctness. §3.7 is the argument about where between those to sit.
-    * You are allowed to grow differently before and after your first loss.
-      That distinction has a name in the textbook.
+    * 링크는 슬롯당 패킷 하나를 내보내고 왕복 시간은 20슬롯이므로, 파이프에는
+      약 20개의 패킷이 담깁니다. 그 이상은 큐를 채울 뿐입니다.
+    * 큐는 10패킷 깊이이고 꼬리에서 버립니다(tail drop). 큐를 채운다고 빨라지지
+      않습니다 - 여러분도 느려지고, 뒤에 있는 모두도 느려집니다.
+    * 손실마다 세게 줄이면 처리량을 잃습니다. 줄이지 않으면 정확성을 잃습니다.
+      §3.7은 그 사이 어디에 앉을지에 대한 논증입니다.
+    * 첫 손실 전과 후에 다르게 키워도 됩니다. 그 구분에는 교재에 나오는 이름이 있습니다.
+
+    구현 - 손실이 알려 주는 것은 "줄여라"만이 아니라 "네트워크가 이만큼만 담았다"입니다.
+
+    * 슬로 스타트: 첫 손실 전에는 ACK 하나에 +1 (RTT 마다 두 배).
+    * 혼잡 회피: 그 뒤에는 ACK 하나에 +1/window (RTT 마다 +1).
+    * 손실은 타임아웃으로만 보이고, 타임아웃은 RTT 의 3배입니다. 그래서 손실을 알아챈
+      순간에는 이미 같은 혼잡으로 버려진 패킷이 여러 개 더 떠 있습니다. 슬로 스타트를
+      빠져나올 때는 특히 심해서, 윈도가 81 까지 자란 뒤에야 첫 손실이 보이고 그때 떠 있던
+      것 중 50개 넘게 이미 버려진 상태입니다.
+    * 그래서 손실 하나를 처음 보면 회복 구간을 엽니다. 그때 떠 있던 양(윈도)에서 손실을
+      하나씩 뺀 것이 "네트워크가 실제로 담고 있던 양"의 추정이고, 윈도는 늘 그 추정의
+      BETA 배입니다. 회복 구간 안에서 이어 오는 손실은 새 혼잡 신호가 아니라 같은 사건의
+      나머지이므로, 다시 곱해서 줄이지 않고 추정만 하나씩 깎습니다 (NewReno 의 "한 번의
+      혼잡에 한 번만 줄인다"와 같은 생각입니다).
+    * 회복 구간은 그 비행분의 RECOVERY_FLIGHTS 배만큼의 사건(ACK + 손실) 동안입니다.
+      송신자는 자기 타임아웃이 RTT 의 몇 배인지 알고 있고(여기서는 3), 회복 시작 전에
+      보낸 패킷의 손실은 그 시간 안에 모두 드러납니다.
+    * BETA = 2/3: 손실이 나는 지점은 파이프 + 큐 = 20 + 10 = 30 입니다. 줄인 뒤의 윈도가
+      파이프(20)와 같아지면 링크는 쉬지 않고 큐는 비어서, 톱니가 [20, 30] 에서 움직입니다.
+      20 / 30 = 2/3. 교과서의 1/2 이면 15 까지 내려가 링크가 놀고, 0.7 이상이면 바닥에서도
+      큐가 차 있습니다.
     """
 
+    BETA = 2 / 3               # 손실 뒤에 남기는 비율 = 파이프 / (파이프 + 큐)
+    RECOVERY_FLIGHTS = 3       # 타임아웃 / RTT: 이전 비행분의 손실이 다 드러날 때까지
+
     def __init__(self):
-        self.window = 1
-        raise NotImplementedError("write your congestion control")
+        self.window = 1.0
+        self.ssthresh = float("inf")   # 첫 손실 전까지는 슬로 스타트
+        self.recover = 0               # 회복 구간에 남은 사건(ACK·손실) 수
+        self.held = 0.0                # 네트워크가 실제로 담고 있던 패킷 수의 추정
 
     def on_ack(self):
-        raise NotImplementedError
+        if self.recover > 0:           # 회복 중에는 키우지 않습니다
+            self.recover -= 1
+            return
+        if self.window < self.ssthresh:
+            self.window += 1                    # 슬로 스타트
+        else:
+            self.window += 1 / self.window      # 혼잡 회피 (AIMD 의 AI)
 
     def on_loss(self):
-        raise NotImplementedError
+        if self.recover > 0:
+            # 같은 혼잡 때 이미 버려졌던 패킷이 이제야 타임아웃됐을 뿐입니다.
+            # 새 신호가 아니라 "네트워크가 하나 덜 담고 있었다"는 정보입니다.
+            self.recover -= 1
+            self.held -= 1
+        else:
+            self.recover = int(self.RECOVERY_FLIGHTS * self.window)
+            self.held = self.window - 1
+        self.window = self.ssthresh = max(2.0, self.BETA * self.held)   # AIMD 의 MD
