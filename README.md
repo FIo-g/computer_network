@@ -1,3 +1,6 @@
+> **개인 실습 저장소**: 고려대학교 세종캠퍼스 2026-2 컴퓨터네트워크 실습을 진행하는 저장소입니다.
+> 원본 실습 저장소는 [codingchild2424/2026-lecture-network-practice](https://github.com/codingchild2424/2026-lecture-network-practice)이며, 아래는 원본 README입니다.
+
 # Computer Networks · Labs
 
 2026-2 · Korea University Sejong · **Weeks 2 – 7**
